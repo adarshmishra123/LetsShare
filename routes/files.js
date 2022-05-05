@@ -33,13 +33,13 @@ router.post('/', (req, res) => {
 router.post('/send', async (req, res) => {
   const { uuid, emailTo, emailFrom, expiresIn } = req.body;
   if(!uuid || !emailTo || !emailFrom) {
-      return res.status(422).send({ error: 'All fields are required except expiry.'});
+      return res.send({ error: 'All fields are required except expiry.'});
   }
   // Get data from db 
   try {
     const file = await File.findOne({ uuid: uuid });
     if(file.sender) {
-      return res.status(422).send({ error: 'Email already sent once.'});
+      return res.send({ error: 'Email already sent once.'});
     }
     file.sender = emailFrom;
     file.receiver = emailTo;
@@ -49,7 +49,7 @@ router.post('/send', async (req, res) => {
     sendMail({
       from: emailFrom,
       to: emailTo,
-      subject: 'inShare file sharing',
+      subject: 'letsShare file sharing',
       text: `${emailFrom} shared a file with you.`,
       html: require('../services/emailTemplate')({
                 emailFrom, 
@@ -60,10 +60,10 @@ router.post('/send', async (req, res) => {
     }).then(() => {
       return res.json({success: true});
     }).catch(err => {
-      return res.status(500).json({error: 'Error in email sending.'});
+      return res.json({error: 'Error in email sending.'});
     });
 } catch(err) {
-  return res.status(500).send({ error: 'Something went wrong.'});
+  return res.send({ error: 'Something went wrong.'});
 }
 
 });
